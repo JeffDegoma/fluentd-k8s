@@ -10,5 +10,8 @@ data:
     <source>
       @type tail
       read_from_head true
-      
+      tag kubernetes-kind.*
+      path /var/log/containers/*.log
+      exclude_path ["/var/log/containers/fluent*"]
     </source>
+  #elastic-conf
