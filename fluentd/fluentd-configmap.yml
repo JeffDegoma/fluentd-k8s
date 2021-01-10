@@ -4,8 +4,10 @@ metadata:
   name: fluentd-config
   namespace: fluentd
 data:
-  fluentd.conf: |-
+  fluent.conf: |-
     @include pods-kind-test-fluent.conf
+    @include local-output-file.conf
+  #ENV.fetch in filter block is Ruby  
   pods-kind-test-fluent.conf: |-
     <source>
       @type tail
@@ -13,5 +15,19 @@ data:
       tag kubernetes-kind.*
       path /var/log/containers/*.log
       exclude_path ["/var/log/containers/fluent*"]
+      <parse>
+        @type regexp
+        expression ^(?<time>\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.[^Z]*Z)\s(?<stream>[^\s]+)\s(?<character>[^\s])\s(?<message>.*)$
+      </parse>
     </source>
+    <filter kubernetes-kind.**>
+      @type kubernetes_metadata
+      kubernetes_url "#{ENV['FLUENT_FILTER_KUBERNETES_URL'] || 'https://' + ENV.fetch('KUBERNETES_SERVICE_HOST') + ':' + ENV.fetch('KUBERNETES_SERVICE_PORT') + '/api'}"
+    </filter>
+  #local file to see output
+  local-output-file.conf: |-
+    <match **>
+      @type file
+      path /tmp/local-output-from-fluentd.log
+    </match>
   #elastic-conf
