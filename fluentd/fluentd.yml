@@ -48,7 +48,7 @@ spec:
       terminationGracePeriodSeconds: 30
       volumes:
       - name: fluentd-config
-        configMap: # mount fluentd-configmap.yml
+        configMap: # specified as a configmap; mount fluentd-configmap.yml
           name: fluentd-config # match name in fluentd-configmap.yml
       - name: varlog
         hostPath:
